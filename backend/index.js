@@ -3,9 +3,12 @@ import express, { urlencoded } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDatabase from './config/database.js';
+import userRoute from "./routes/user.js";
+import companyRoute from "./routes/company.js";
+import errorMiddleware from "./middleware/error.js";
 
 
-dotenv.config({ path: './config/config.env' });
+dotenv.config({});
 
 const app= express();
 
@@ -20,8 +23,16 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 
-const port= 3000;
 
-app.listen(port , ()=>{
-    console.log(`server running at port ${port}`)
+const PORT = process.env.PORT || 3000;
+
+// api's
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/company",companyRoute)
+
+//middleware for error  
+app.use(errorMiddleware)
+
+app.listen(PORT , ()=>{
+    console.log(`server running at PORT ${PORT}`)
 })
