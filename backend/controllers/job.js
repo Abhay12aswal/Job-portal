@@ -49,6 +49,7 @@ export const postJob = catchAsyncError(async (req, res, next) => {
     success: true,
   });
 });
+
 // student k liye
 export const getAllJobs = catchAsyncError(async (req, res, next) => {
   const keyword = req.query.keyword || "";
@@ -71,17 +72,17 @@ export const getAllJobs = catchAsyncError(async (req, res, next) => {
     success: true,
   });
 });
+
 // student
 export const getJobById = catchAsyncError(async (req, res, next) => {
   const jobId = req.params.id;
-  const job = await Job.findById(jobId).populate({
-    path: "applications",
-  });
+  const job = await Job.findById(jobId)
   if (!job) {
     return next(new ErrorHandler("job not found", 404));
   }
   return res.status(200).json({ job, success: true });
 });
+
 // admin kitne job create kra hai abhi tk
 export const getAdminJobs = catchAsyncError(async (req, res, next) => {
   const adminId = req.id;
