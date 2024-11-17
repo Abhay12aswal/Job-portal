@@ -9,6 +9,8 @@ import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import axios from "axios";
 import { USER_API_END_POINT } from '@/utils/constant'
+import { useDispatch, useSelector } from "react-redux";
+import { setLoading } from "@/redux/authSlice";
 
 const Login = () => {
   const [input, setInput] = useState({
@@ -18,8 +20,10 @@ const Login = () => {
   });
 
   const navigate= useNavigate();
+  const dispatch = useDispatch();
 
-  const loading = false;
+  const {loading} = useSelector(state=> state.auth)
+  //const {loading} = useSelector(store=> store.auth)
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -32,10 +36,12 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const res = await axios.post(`${USER_API_END_POINT}/register`, input, {
+      dispatch(setLoading(true));
+      const res = await axios.post(`${USER_API_END_POINT}/login`, input, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
+      
       if (res.data.success) {
         navigate("/");
         toast.success(res.data.message);
@@ -43,6 +49,8 @@ const Login = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+    } finally{
+      dispatch(setLoading(false))
     }
   };
 

@@ -3,8 +3,12 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './App.css'
 import Login from './components/auth/Login'
 import Signup from './components/auth/Signup'
-import Navbar from "./components/shared/Navbar"
 import Home from './components/Home'
+import Browse from './components/pages/Browse'
+import Profile from './components/pages/Profile'
+import Jobs from './components/pages/Jobs'
+
+
 
 
 
@@ -21,22 +25,22 @@ const appRouter = createBrowserRouter([
     path: '/signup',
     element: <Signup />
   },
-  // {
-  //   path: "/jobs",
-  //   element: <Jobs />
-  // },
+  {
+    path: "/jobs",
+    element: <Jobs/>
+  },
   // {
   //   path: "/description/:id",
   //   element: <JobDescription />
   // },
-  // {
-  //   path: "/browse",
-  //   element: <Browse />
-  // },
-  // {
-  //   path: "/profile",
-  //   element: <Profile />
-  // },
+  {
+    path: "/browse",
+    element: <Browse />
+  },
+  {
+    path: "/profile",
+    element: <Profile />
+  },
   // // admin ke liye yha se start hoga
   // {
   //   path:"/admin/companies",
