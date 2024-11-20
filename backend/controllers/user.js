@@ -3,6 +3,8 @@ import ErrorHandler from "../utils/errorHandler.js";
 import { User } from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDaraUri from "../utils/dataurl.js";
+import cloudinary from "../utils/cloudinary.js";
 
 //register
 export const register = catchAsyncError(async (req, res, next) => {
@@ -11,6 +13,11 @@ export const register = catchAsyncError(async (req, res, next) => {
   if (!fullname || !email || !phoneNumber || !password || !role) {
     return next(new ErrorHandler("Please enter the following details", 400));
   }
+
+  const file = req.file;
+  const fileUri = getDaraUri(file);
+  const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+
 
   const user = await User.findOne({ email });
   if (user) {
@@ -25,6 +32,9 @@ export const register = catchAsyncError(async (req, res, next) => {
     phoneNumber,
     password: hashedPassword,
     role,
+    profile: {
+      profilePhoto: cloudResponse.secure_url,
+    }
   });
 
   return res.status(201).json({
@@ -107,9 +117,12 @@ export const getAllUser = catchAsyncError(async(req,res,next)=>{
 export const updateprofile = catchAsyncError(async (req, res, next) => {
   const { fullname, email, phoneNumber, bio, skills } = req.body;
 
+    //cloudinary
   const file = req.file;
+  const fileUri = getDaraUri(file);
 
-  //cloudinary
+  const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+  
   let skillsArray;
   if(skills){
     skillsArray = skills.split(",");
@@ -128,7 +141,11 @@ export const updateprofile = catchAsyncError(async (req, res, next) => {
   if (bio) user.profile.bio = bio;
   if (skills) user.profile.skills = skillsArray;
 
-  //resume later
+  //resume  
+  if(cloudResponse){
+    user.profile.resume = cloudResponse.secure_url //save the cloudinary url
+    user.profile.resumeOriginalName = file.originalname //save the original file name
+  }
 
   await user.save();
 
