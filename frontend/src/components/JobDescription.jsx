@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {APPLICATION_API_END_POINT , JOB_API_END_POINT } from "@/utils/constant";
 import {
   Card,
   CardContent,
@@ -18,40 +19,69 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Navbar from "./shared/Navbar";
+import axios from "axios";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setSingleJob } from "@/redux/jobSlice";
 
 export default function JobDescription() {
-  // Dummy data for testing
-  const dummyJob = {
-    _id: "1",
-    title: "Frontend Developer",
-    position: 3,
-    jobType: "Full-Time",
-    salary: 15, // in LPA
-    location: "New York, USA",
-    experience: 2, // in years
-    applications: [{ applicant: "user_1" }, { applicant: "user_2" }],
-    createdAt: "2024-11-10T12:00:00Z",
-    description:
-      "We are looking for a skilled Frontend Developer to join our team. The ideal candidate will have experience in React and TypeScript.",
-  };
 
-  const dummyUser = {
-    _id: "user_3",
-    name: "John Doe",
-  };
+  const { singleJob } = useSelector((store) => store.job);
+  const { user } = useSelector((store) => store.auth);
 
-  const isInitiallyApplied = dummyJob.applications.some(
-    (application) => application.applicant === dummyUser._id
-  );
+  const isIntiallyApplied =
+    singleJob?.applications?.some(
+      (application) => application.applicant === user?._id
+    ) || false;
 
-  const [isApplied, setIsApplied] = useState(isInitiallyApplied);
+  const [isApplied, setIsApplied] = useState(isIntiallyApplied);
 
-  const applyJobHandler = () => {
-    if (!isApplied) {
-      setIsApplied(true);
-      toast.success("You have successfully applied for this job.");
+  const params = useParams();
+  const jobId = params.id;
+  const dispatch = useDispatch();
+
+  const applyJobHandler = async () => {
+    try {
+      const res = await axios.get(
+        `${APPLICATION_API_END_POINT}/apply/${jobId}`,
+        { withCredentials: true }
+      );
+
+      if (res.data.success) {
+        setIsApplied(true); 
+        const updatedSingleJob = {
+          ...singleJob,
+          applications: [...singleJob.applications, { applicant: user?._id }],
+        };
+        dispatch(setSingleJob(updatedSingleJob));  
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.response.data.message);
     }
   };
+
+  useEffect(() => {
+    const fetchSingleJob = async () => {
+      try {
+        const res = await axios.get(`${JOB_API_END_POINT}/get/${jobId}`, {
+          withCredentials: true,
+        });
+        if (res.data.success) {
+          dispatch(setSingleJob(res.data.job));
+          setIsApplied(
+            res.data.job.applications.some(
+              (application) => application.applicant === user?._id
+            )
+          ); 
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchSingleJob();
+  }, [jobId, dispatch, user?._id]);
 
   return (
     <div>
@@ -62,20 +92,20 @@ export default function JobDescription() {
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle className="text-2xl font-bold mb-2">
-                  {dummyJob.title}
+                  {singleJob?.title}
                 </CardTitle>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary" className="text-blue-700">
                     <Briefcase className="w-4 h-4 mr-1" />
-                    {dummyJob.position} Positions
+                    {singleJob?.position} Positions
                   </Badge>
                   <Badge variant="secondary" className="text-red-600">
                     <Clock className="w-4 h-4 mr-1" />
-                    {dummyJob.jobType}
+                    {singleJob?.jobType}
                   </Badge>
                   <Badge variant="secondary" className="text-purple-700">
                     <DollarSign className="w-4 h-4 mr-1" />
-                    {dummyJob.salary} LPA
+                    {singleJob?.salary} LPA
                   </Badge>
                 </div>
               </div>
@@ -100,33 +130,33 @@ export default function JobDescription() {
               <div className="flex items-center">
                 <MapPin className="w-5 h-5 mr-2 text-gray-500" />
                 <span className="font-medium">Location:</span>
-                <span className="ml-2">{dummyJob.location}</span>
+                <span className="ml-2">{singleJob?.location}</span>
               </div>
               <div className="flex items-center">
                 <Briefcase className="w-5 h-5 mr-2 text-gray-500" />
                 <span className="font-medium">Experience:</span>
-                <span className="ml-2">{dummyJob.experience} years</span>
+                <span className="ml-2">{singleJob?.experience} years</span>
               </div>
               <div className="flex items-center">
                 <DollarSign className="w-5 h-5 mr-2 text-gray-500" />
                 <span className="font-medium">Salary:</span>
-                <span className="ml-2">{dummyJob.salary} LPA</span>
+                <span className="ml-2">{singleJob?.salary} LPA</span>
               </div>
               <div className="flex items-center">
                 <Users className="w-5 h-5 mr-2 text-gray-500" />
                 <span className="font-medium">Total Applicants:</span>
-                <span className="ml-2">{dummyJob.applications.length}</span>
+                <span className="ml-2">{singleJob?.applications.length}</span>
               </div>
               <div className="flex items-center">
                 <Calendar className="w-5 h-5 mr-2 text-gray-500" />
                 <span className="font-medium">Posted Date:</span>
                 <span className="ml-2">
-                  {new Date(dummyJob.createdAt).toLocaleDateString()}
+                  {new Date(singleJob?.createdAt).toLocaleDateString()}
                 </span>
               </div>
             </div>
             <h2 className="text-lg font-semibold mt-6 mb-2">Description</h2>
-            <p className="text-gray-700">{dummyJob.description}</p>
+            <p className="text-gray-700">{singleJob?.description}</p>
           </CardContent>
           <CardFooter className="flex justify-end">
             <Button variant="outline" onClick={() => window.history.back()}>

@@ -8,7 +8,10 @@ import cloudinary from "../utils/cloudinary.js";
 
 //register
 export const register = catchAsyncError(async (req, res, next) => {
-  const { fullname, email, phoneNumber, password, role } = req.body;
+  const { fullname, email, phoneNumber, password, role  } = req.body;
+
+  // console.log("Body:", req.body);
+  // console.log("File:", req.file);
 
   if (!fullname || !email || !phoneNumber || !password || !role) {
     return next(new ErrorHandler("Please enter the following details", 400));
@@ -116,6 +119,9 @@ export const getAllUser = catchAsyncError(async(req,res,next)=>{
 //updateprofile
 export const updateprofile = catchAsyncError(async (req, res, next) => {
   const { fullname, email, phoneNumber, bio, skills } = req.body;
+
+  //console.log("Body:", req.body);
+  //console.log("File:", req.file);
 
     //cloudinary
   const file = req.file;

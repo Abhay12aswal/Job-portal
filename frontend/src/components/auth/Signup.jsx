@@ -8,7 +8,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
-import { USER_API_END_POINT } from '@/utils/constant'
+import { USER_API_END_POINT } from "@/utils/constant";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "@/redux/authSlice";
 
@@ -22,13 +22,11 @@ const Signup = () => {
     file: "",
   });
 
+  const navigate = useNavigate();
 
-  const navigate= useNavigate();
-
-  const {loading} = useSelector(store=> store.auth)
+  const { loading } = useSelector((store) => store.auth);
 
   const dispatch = useDispatch();
-
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -49,14 +47,13 @@ const Signup = () => {
       formData.append("file", input.file);
     }
 
-
     try {
       dispatch(setLoading(true));
       const res = await axios.post(`${USER_API_END_POINT}/register`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
         withCredentials: true,
       });
-    
+
       if (res.data.success) {
         navigate("/login");
         toast.success(res.data.message);
@@ -64,8 +61,8 @@ const Signup = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
-    } finally{
-      dispatch(setLoading(false))
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 
@@ -147,6 +144,7 @@ const Signup = () => {
               <Label>Profile</Label>
               <Input
                 accept="image/*"
+                
                 type="file"
                 onChange={changeFileHandler}
                 className="cursor-pointer"

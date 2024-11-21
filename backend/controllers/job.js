@@ -76,7 +76,9 @@ export const getAllJobs = catchAsyncError(async (req, res, next) => {
 // student
 export const getJobById = catchAsyncError(async (req, res, next) => {
   const jobId = req.params.id;
-  const job = await Job.findById(jobId)
+  const job = await Job.findById(jobId).populate({
+    path:"applications"
+  })
   if (!job) {
     return next(new ErrorHandler("job not found", 404));
   }
