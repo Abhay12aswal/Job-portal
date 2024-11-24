@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Search } from "lucide-react";
 import { useDispatch } from "react-redux";
-// import { setSearchedQuery } from '@/redux/jobSlice';
+import { setSearchedQuery } from '@/redux/jobSlice';
 import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
@@ -11,8 +11,16 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   const searchJobHandler = () => {
-    // dispatch(setSearchedQuery(query));
-    // navigate("/browse");
+    if (query.trim()) {
+      dispatch(setSearchedQuery(query));
+      navigate("/browse");
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      searchJobHandler();
+    }
   };
 
   return (
@@ -33,7 +41,9 @@ const HeroSection = () => {
           <input
             type="text"
             placeholder="Find your dream jobs"
+            value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown} 
             className="outline-none border-none w-full"
           />
           <Button

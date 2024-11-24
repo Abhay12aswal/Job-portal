@@ -1,6 +1,8 @@
 import catchAsyncError from "../middleware/catchAsyncError.js";
 import { Company } from "../models/company.js";
 import ErrorHandler from "../utils/errorHandler.js";
+import getDataUri from "../utils/dataurl.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const registerCompany = catchAsyncError(async (req, res, next) => {
   const { companyName } = req.body;
@@ -60,8 +62,12 @@ export const updateCompany = catchAsyncError(async (req, res, next) => {
   const file = req.file;
 
   //cloudinary
+  const fileUri= getDataUri(file);
 
-  const updateData = { name, description, website, location };
+  const cloudResponse= await cloudinary.uploader.upload(fileUri.content)
+  const logo= cloudResponse.secure_url;
+
+  const updateData = { name, description, website, location ,logo };
 
   const company = await Company.findByIdAndUpdate(req.params.id, updateData, {
     new: true,

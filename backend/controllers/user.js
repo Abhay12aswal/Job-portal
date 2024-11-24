@@ -1,14 +1,14 @@
-import  catchAsyncError  from "../middleware/catchAsyncError.js";
+import catchAsyncError from "../middleware/catchAsyncError.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { User } from "../models/user.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import getDaraUri from "../utils/dataurl.js";
+import getDataUri from "../utils/dataurl.js";
 import cloudinary from "../utils/cloudinary.js";
 
 //register
 export const register = catchAsyncError(async (req, res, next) => {
-  const { fullname, email, phoneNumber, password, role  } = req.body;
+  const { fullname, email, phoneNumber, password, role } = req.body;
 
   // console.log("Body:", req.body);
   // console.log("File:", req.file);
@@ -18,9 +18,8 @@ export const register = catchAsyncError(async (req, res, next) => {
   }
 
   const file = req.file;
-  const fileUri = getDaraUri(file);
+  const fileUri = getDataUri(file);
   const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-
 
   const user = await User.findOne({ email });
   if (user) {
@@ -37,7 +36,7 @@ export const register = catchAsyncError(async (req, res, next) => {
     role,
     profile: {
       profilePhoto: cloudResponse.secure_url,
-    }
+    },
   });
 
   return res.status(201).json({
@@ -107,14 +106,14 @@ export const logout = catchAsyncError(async (req, res, next) => {
 });
 
 //get all users
-export const getAllUser = catchAsyncError(async(req,res,next)=>{
+export const getAllUser = catchAsyncError(async (req, res, next) => {
   const user = await User.find();
 
   res.status(200).json({
     success: true,
-    user
-  })
-})
+    user,
+  });
+});
 
 //updateprofile
 export const updateprofile = catchAsyncError(async (req, res, next) => {
@@ -123,14 +122,14 @@ export const updateprofile = catchAsyncError(async (req, res, next) => {
   //console.log("Body:", req.body);
   //console.log("File:", req.file);
 
-    //cloudinary
+  //cloudinary
   const file = req.file;
-  const fileUri = getDaraUri(file);
+  const fileUri = getDataUri(file);
 
   const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
-  
+
   let skillsArray;
-  if(skills){
+  if (skills) {
     skillsArray = skills.split(",");
   }
   const userId = req.id; //middleware authentiaction
@@ -147,10 +146,10 @@ export const updateprofile = catchAsyncError(async (req, res, next) => {
   if (bio) user.profile.bio = bio;
   if (skills) user.profile.skills = skillsArray;
 
-  //resume  
-  if(cloudResponse){
-    user.profile.resume = cloudResponse.secure_url //save the cloudinary url
-    user.profile.resumeOriginalName = file.originalname //save the original file name
+  //resume
+  if (cloudResponse) {
+    user.profile.resume = cloudResponse.secure_url; //save the cloudinary url
+    user.profile.resumeOriginalName = file.originalname; //save the original file name
   }
 
   await user.save();
@@ -170,4 +169,3 @@ export const updateprofile = catchAsyncError(async (req, res, next) => {
     success: true,
   });
 });
-

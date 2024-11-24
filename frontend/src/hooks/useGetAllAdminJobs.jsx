@@ -17,7 +17,7 @@ const useGetAllAdminJobs = () => {
         }
       } catch (error) {
         console.log(error);
-      }
+      } 
     };
     fetchAllAdminJobs();
   }, []);

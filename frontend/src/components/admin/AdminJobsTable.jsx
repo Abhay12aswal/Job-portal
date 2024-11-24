@@ -8,7 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { Avatar, AvatarImage } from "../ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Edit2, Eye, MoreHorizontal } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -39,10 +38,10 @@ const AdminJobsTable = () => {
         <TableCaption>A list of your recent posted jobs</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Company Name</TableHead>
-            <TableHead>Role</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead className="text-right">Action</TableHead>
+            <TableHead className="text-gray-950">Company Name</TableHead>
+            <TableHead className="text-gray-950">Role</TableHead>
+            <TableHead className="text-gray-950">Date</TableHead>
+            <TableHead className="text-right text-gray-950">Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
